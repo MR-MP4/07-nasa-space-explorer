@@ -13,26 +13,53 @@ const gallery = document.getElementById('gallery');
 
 getImgButton.addEventListener('click', fetchImages);
 
+function createGallery(imageData) {
+  gallery.innerHTML = '';
+  imageData.forEach(item => {
+    const article = document.createElement('article');
+    article.classList.add('gallery-item');
+
+    article.innerHTML = `
+    <img src="${item.hdurl}" alt="${item.title}" class="gallery-image">
+    <div class="gallery-info">
+      <h2 class="gallery-title">${item.title}</h2>
+      <p class="gallery-date">Created: ${item.date}</p>
+      <p class="gallery-description">${item.explanation}</p>
+    </div>
+    `;
+
+    gallery.appendChild(article);
+  });
+}
+
 async function fetchImages() {
   const startDate = startInput.value;
   const endDate = endInput.value;
-  console.log(`Fetching images from ${startDate} to ${endDate}`);
-  // Here you would typically call an API to fetch images based on the date range
-  try {
-    const API_URL = `https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=${startDate}&end_date=${endDate}`;
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    const imageData = data.filter(item => item.media_type === 'image');
 
-gallery.innerHTML = imageData.map(item => `
-  <article class="gallery-item">
-    <img src="${item.url}" alt="${item.title}">
-    <h2>${item.title}</h2>
-    <p>${item.date}</p>
-    <p>${item.explanation}</p>
-  </article>
-`).join('');
+  if (!startDate || !endDate) {
+    gallery.textContent = 'Please select both a start date and an end date.';
+    return;
+  }
+
+  gallery.textContent = 'Loading space images...';
+
+  try {
+    const API_KEY = 'R8Htz8W9FFnPLtcMmPnjjBLqL9BbcGLmRnjjc7kc';
+    const url = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&start_date=${startDate}&end_date=${endDate}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`NASA API request failed (${response.status}). Check the date range or API key and try again.`);
+    }
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error(data.error?.message || 'NASA returned an unexpected response.');
+    }
+    createGallery(data);
   } catch (error) {
     console.error('Error fetching images:', error);
+    gallery.textContent = error instanceof Error
+      ? error.message
+      : 'Unable to load space images. Please try again.';
   }
 }
