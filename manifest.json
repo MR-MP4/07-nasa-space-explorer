@@ -1,0 +1,20 @@
+
+  {
+    "name": "NASA Space Explorer",
+    "short_name": "Space Explorer",
+    "description": "Browse NASA's Astronomy Picture of the Day across any date range.",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#f1f1f1",
+    "theme_color": "#0b3d91",
+    "orientation": "portrait-primary",
+    "icons": [
+      {
+        "src": "img/NASA-Logo-Large.jpg",
+        "sizes": "800x800",
+        "type": "image/jpeg",
+        "purpose": "any"
+      }
+    ]
+  }
