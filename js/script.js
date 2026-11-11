@@ -51,7 +51,14 @@ function openImageModal(item) {
   modalDate.textContent = `Date: ${item.date}`;
   modalDescription.textContent = cleanExplanation(item.explanation);
 
-  if (notificationCounter === 5) {
+  if (
+    notificationCounter >= 5 &&
+    localStorage.getItem("notificationPromptRequested") !== "true" &&
+    "Notification" in window &&
+    Notification.permission === "default" &&
+    window.isSecureContext
+  ) {
+    localStorage.setItem("notificationPromptRequested", "true");
     requestNotificationPermission();
   }
 
@@ -216,6 +223,11 @@ window.addEventListener("appinstalled", () => {
 });
 
 function requestNotificationPermission() {
+  if (!window.isSecureContext) {
+    console.log("[App] Notifications require HTTPS or localhost");
+    return;
+  }
+
   if (!("Notification" in window)) {
     console.log("[App] This browser doesn't support notifications");
     return;
@@ -225,9 +237,11 @@ function requestNotificationPermission() {
     console.log(`[App] Notification permission: ${permission}`);
     if (permission === "granted") {
       new Notification("Space Explorer", {
-        body: "Notifications are on! We'll keep this simple for now.",
+        body: "Notifications are on! You'll be notified about new space images.",
         icon: "img/nasa-worm-logo.png",
       });
     }
+  }).catch((error) => {
+    console.error("[App] Could not request notification permission:", error);
   });
 }
