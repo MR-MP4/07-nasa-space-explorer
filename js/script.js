@@ -17,10 +17,15 @@ const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalDescription = document.getElementById('modalDescription');
 const offlineBanner = document.getElementById("offline-banner");
+let notificationCounter = localStorage.getItem("notificationCounter") || 0;
 
 window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 updateOnlineStatus();
+
+if (notificationCounter === 5) {
+  requestNotificationPermission();
+}
 
 getImgButton.addEventListener('click', fetchImages);
 closeModalButton.addEventListener('click', () => imageModal.close());
@@ -43,6 +48,8 @@ function cleanExplanation(explanation) {
 }
 
 function openImageModal(item) {
+  notificationCounter++;
+  localStorage.setItem("notificationCounter", notificationCounter);
   modalMedia.innerHTML = '';
   modalTitle.textContent = item.title;
   modalDate.textContent = `Date: ${item.date}`;
@@ -179,6 +186,16 @@ window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
   installBanner.classList.remove("hidden");
+});
+
+const installButton = document.getElementById("install-banner");
+
+if (window.matchMedia("(display-mode: standalone)").matches) {
+    installButton.style.display = "none";
+}
+
+window.addEventListener("appinstalled", () => {
+    installButton.style.display = "none";
 });
 
 installBanner.addEventListener("click", async () => {
