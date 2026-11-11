@@ -289,7 +289,3 @@ button:hover {
 .install-banner:hover {
   background-color: #3867d6;
 }
-
-.install-banner.hidden {
-  display: none;
-}
