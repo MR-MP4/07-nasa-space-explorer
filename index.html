@@ -12,6 +12,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 </head>
 <body>
+  <div id="offline-banner" class="offline-banner hidden">
+  You're offline - showing your last loaded images.
+  </div>
   <div class="container">
     <header class="site-header">
       <img src="img/nasa-worm-logo.png" alt="NASA Logo" class="logo" />
@@ -39,6 +42,10 @@
       <p id="modalDescription" class="modal-description"></p>
     </dialog>
   </div>
+
+  <button id="install-banner" class="install-banner hidden" type="button">
+    Install Space Explorer
+  </button>
 
   <script src="js/dateRange.js"></script>
   <script src="js/script.js"></script>

@@ -16,6 +16,11 @@ const modalMedia = document.getElementById('modalMedia');
 const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalDescription = document.getElementById('modalDescription');
+const offlineBanner = document.getElementById("offline-banner");
+
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+updateOnlineStatus();
 
 getImgButton.addEventListener('click', fetchImages);
 closeModalButton.addEventListener('click', () => imageModal.close());
@@ -148,4 +153,64 @@ async function fetchImages() {
       ? error.message
       : 'Unable to load space images. Please try again.';
   }
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+    .register("./service-worker. js")
+    .then((reg) => console.log("[App] Service worker registered:", reg. scope))
+    .catch((err) => console.error("[App] Service worker registration  failed:", err));
+  });
+}
+
+function updateOnlineStatus() {
+  if (navigator.onLine) {
+    offlineBanner.classList.add("hidden");
+  } else {
+    offlineBanner.classList.remove("hidden");
+  }
+}
+
+let deferredInstallPrompt = null;
+const installBanner = document.getElementById("install-banner");
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installBanner.classList.remove("hidden");
+});
+
+installBanner.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+
+  const installPrompt = deferredInstallPrompt;
+  deferredInstallPrompt = null;
+  installBanner.classList.add("hidden");
+
+  installPrompt.prompt();
+  const { outcome } = await installPrompt.userChoice;
+  console.log(`[App] Install prompt outcome: ${outcome}`);
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  installBanner.classList.add("hidden");
+});
+
+function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    console.log("[App] This browser doesn't support notifications");
+    return;
+  }
+
+  Notification.requestPermission().then((permission) => {
+    console.log(`[App] Notification permission: ${permission}`);
+    if (permission === "granted") {
+      new Notification("Space Explorer", {
+        body: "Notifications are on! We'll keep this simple for now.",
+        icon: "img/nasa-worm-logo.png",
+      });
+    }
+  });
 }
