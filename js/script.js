@@ -17,15 +17,11 @@ const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalDescription = document.getElementById('modalDescription');
 const offlineBanner = document.getElementById("offline-banner");
-let notificationCounter = localStorage.getItem("notificationCounter") || 0;
+let notificationCounter = Number(localStorage.getItem("notificationCounter")) || 0;
 
 window.addEventListener("online", updateOnlineStatus);
 window.addEventListener("offline", updateOnlineStatus);
 updateOnlineStatus();
-
-if (notificationCounter === 5) {
-  requestNotificationPermission();
-}
 
 getImgButton.addEventListener('click', fetchImages);
 closeModalButton.addEventListener('click', () => imageModal.close());
@@ -54,6 +50,10 @@ function openImageModal(item) {
   modalTitle.textContent = item.title;
   modalDate.textContent = `Date: ${item.date}`;
   modalDescription.textContent = cleanExplanation(item.explanation);
+
+  if (notificationCounter === 5) {
+    requestNotificationPermission();
+  }
 
   if (item.media_type === 'image') {
     const img = document.createElement('img');
